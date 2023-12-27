@@ -1,0 +1,162 @@
+#!/usr/bin/env python3
+
+import sys
+import os
+from rich import *
+import subprocess as sp
+
+pwd = os.getcwd() + "/"
+
+args = sys.argv
+
+validHelperCommands = ["help", "examples"]
+validCommands = ["stress"]
+
+
+def help():
+    print("Valid Helper Commands\n")
+
+    for command in validHelperCommands:
+        print("\t", command)
+
+    print("\nValid Commands\n")
+
+    for command in validCommands:
+        print("\t", command)
+
+    print()
+
+
+def examples():
+    def validOptions():
+        print("Valid Examples Options\n")
+        print("\tstress")
+        print()
+
+    def stress():
+        print()
+        print("mbcp stress gen_file wrong_file correct_file")
+        print()
+
+    if len(args) >= 3:
+        if args[2] == "stress":
+            stress()
+        else:
+            print("Failed to find example for " + args[2])
+    else:
+        validOptions()
+
+
+def stress():
+    if len(args) < 5:
+        raise Exception
+
+    genFile = pwd + args[2]
+    wrongFile = pwd + args[3]
+    correctFile = pwd + args[4]
+
+    intFile = pwd + "int"
+    out1File = pwd + "out1"
+    out2File = pwd + "out2"
+
+    i = 0
+    while True:
+        print("Test: " + str(i), end="\r")
+
+        genRun = genFile + " " + str(i)
+        wrongRun = wrongFile + " < " + intFile
+        correctRun = correctFile + " < " + intFile
+        diffRun = "diff -w " + out1File + " " + out2File
+
+        # genFile run
+        genOut = sp.run(genRun, capture_output=True, text=True, shell=True)
+
+        if genOut.stderr:
+            print("Error has occured while generating input.")
+            break
+
+        genOutFile = open(intFile, "w")
+
+        genOutFile.write(genOut.stdout)
+
+        genOutFile.close()
+
+        # wrongFile run
+        wrongOut = sp.run(wrongRun, capture_output=True, text=True, shell=True)
+
+        if wrongOut.stderr:
+            print("Error has occured while running " + args[3])
+            break
+
+        wrongOutFile = open(out1File, "w")
+
+        wrongOutFile.write(wrongOut.stdout)
+
+        wrongOutFile.close()
+
+        # correctFile run
+        correctOut = sp.run(correctRun, capture_output=True, text=True, shell=True)
+
+        if correctOut.stderr:
+            print("Error has occured while running " + args[4])
+            break
+
+        correctOutFile = open(out2File, "w")
+
+        correctOutFile.write(correctOut.stdout)
+
+        correctOutFile.close()
+
+        # compare difference
+        diffOut = sp.run(diffRun, capture_output=True, text=True, shell=True)
+
+        if diffOut.stderr:
+            print("Error has occured while comparing outputs.")
+            break
+
+        if diffOut.stdout:
+            print("Test case:", i)
+            print("--------- Input ---------")
+            print(genOut.stdout)
+            print("--------- Outputs ---------")
+            print(wrongOut.stdout)
+            print("------")
+            print(correctOut.stdout)
+
+            return
+
+        i += 1
+
+
+def main():
+    if len(args) == 1:
+        help()
+        return
+
+    if args[1] == "help":
+        help()
+    elif args[1] == "examples":
+        examples()
+    elif args[1] == "stress":
+        stress()
+    else:
+        print("Failed to find valid command.")
+        print("mbcp help")
+
+
+if __name__ == "__main__":
+    try:
+        main()
+    except SystemExit:
+        pass
+    except Exception:
+        print("Please check examples.")
+        print("mbcp examples [", end="")
+        for i in range(len(validCommands)):
+            print(validCommands[i] + "", end="")
+            if i == len(validCommands) - 1:
+                print("]")
+            else:
+                print(", ", end="")
+    except:
+        print("[red]An internal error occured. OH NO![/red]")
