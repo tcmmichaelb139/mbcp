@@ -59,11 +59,11 @@ def stress():
     out1File = pwd + "out1"
     out2File = pwd + "out2"
 
-    i = 0
+    testNumber = 0
     while True:
-        print("Test: " + str(i), end="\r")
+        print("Test: " + str(testNumber), end="\r")
 
-        genRun = genFile + " " + str(i)
+        genRun = genFile + " " + str(testNumber)
         wrongRun = wrongFile + " < " + intFile
         correctRun = correctFile + " < " + intFile
         diffRun = "diff -w " + out1File + " " + out2File
@@ -115,7 +115,7 @@ def stress():
             break
 
         if diffOut.stdout:
-            print("Test case:", i)
+            print("Test case:", testNumber)
             print("--------- Input ---------")
             print(genOut.stdout)
             print("--------- Outputs ---------")
@@ -125,7 +125,7 @@ def stress():
 
             return
 
-        i += 1
+        testNumber += 1
 
 
 def main():
