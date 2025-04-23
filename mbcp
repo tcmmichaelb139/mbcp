@@ -63,16 +63,18 @@ def stress():
     while True:
         print("Test: " + str(testNumber), end="\r")
 
-        genRun = genFile + " " + str(testNumber)
-        wrongRun = wrongFile + " < " + intFile
-        correctRun = correctFile + " < " + intFile
-        diffRun = "diff -w " + out1File + " " + out2File
+        genRun = f'{genFile.replace(' ', '\\ ')} {str(testNumber)}'
+        wrongRun = f'{wrongFile.replace(' ', '\\ ')} < {intFile.replace(' ', '\\ ')}'
+        correctRun = f'{correctFile.replace(' ', '\\ ')} < {intFile.replace(' ', '\\ ')}'
+        diffRun = f'diff -w {out1File.replace(' ', '\\ ')} {out2File.replace(' ', '\\ ')}'
 
         # genFile run
         genOut = sp.run(genRun, capture_output=True, text=True, shell=True)
 
         if genOut.stderr:
             print("Error has occured while generating input.")
+            print(f"Command ran: {genRun}")
+            print(genOut.stderr)
             break
 
         genOutFile = open(intFile, "w")
