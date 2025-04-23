@@ -88,6 +88,8 @@ def stress():
 
         if wrongOut.stderr:
             print("Error has occured while running " + args[3])
+            print(f"Command ran: {wrongRun}")
+            print(wrongOut.stderr)
             break
 
         wrongOutFile = open(out1File, "w")
@@ -101,6 +103,8 @@ def stress():
 
         if correctOut.stderr:
             print("Error has occured while running " + args[4])
+            print(f"Command ran: {correctRun}")
+            print(correctOut.stderr)
             break
 
         correctOutFile = open(out2File, "w")
@@ -114,6 +118,8 @@ def stress():
 
         if diffOut.stderr:
             print("Error has occured while comparing outputs.")
+            print(f"Command ran: {diffRun}")
+            print(diffOut.stderr)
             break
 
         if diffOut.stdout:
